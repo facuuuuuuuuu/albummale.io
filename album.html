@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Álbum de Male</title>
+  <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #f1e4c9;
+      font-family: 'UnifrakturCook', cursive;
+      overflow-x: hidden;
+    }
+
+    #book-container {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    #book {
+      width: 95vw;
+      max-width: 800px;
+      height: 90vh;
+      background: #fffaf0;
+      border: 12px solid #5c3a21;
+      box-shadow: 0 0 40px #0005;
+      border-radius: 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .cover {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to right, #c89b6f, #8b5e3c);
+      background-image: url('https://img.freepik.com/fotos-premium/superficie-metalica-como-patron-textura-fondo_77684-52068.jpg?uid=R80647185&ga=GA1.1.953774608.1722984786&semt=ais_hybrid&w=740');
+      background-size: cover;
+      background-position: center;
+      border: 10px solid #5c3a21;
+      box-shadow: 0 0 30px #0006;
+      transform-origin: left;
+      transition: transform 1s ease;
+      position: absolute;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      text-shadow: 1px 1px 4px #000;
+      font-size: 2.2em;
+      text-align: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .cover small {
+      font-size: 0.5em;
+      margin-top: 15px;
+      color: #ffd;
+    }
+
+    #book.open .cover {
+      transform: rotateY(-180deg);
+    }
+
+    .page {
+      padding: 20px;
+      text-align: center;
+      flex-grow: 1;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: url('https://img.freepik.com/foto-gratis/antiguo-fondo-textura-papel_1232-1931.jpg?t=st=1753149205~exp=1753152805~hmac=96ca26008c38f21dcca9f9524ad46c66afd30373ffc16f46abbe34204fb677ea&w=1380') repeat center/cover;
+    }
+
+    .page.active {
+      display: flex;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .page h2 {
+      color: #5c3a21;
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .page img {
+      width: 80%;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 2px dashed #8b5e3c;
+      margin-bottom: 10px;
+      background: #fff;
+    }
+
+    .page input[type="file"] {
+      font-size: 1rem;
+      background: #fff;
+      padding: 5px;
+    }
+
+    #controls {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+
+    .btn {
+      background: #5c3a21;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn:disabled {
+      background: #aaa;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    #mensaje, #instructivo {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #5c3a21;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 1rem;
+      display: none;
+      z-index: 1000;
+    }
+
+    #instructivo {
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 350px;
+      text-align: center;
+      background: #fff;
+      color: #5c3a21;
+      border: 4px solid #5c3a21;
+      box-shadow: 0 0 20px #0005;
+      font-size: 1.1rem;
+    }
+
+    #instructivo button {
+      margin-top: 15px;
+      padding: 8px 16px;
+      border: none;
+      background: #5c3a21;
+      color: white;
+      border-radius: 15px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    audio { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- 📖 Álbum -->
+<div id="book-container">
+  <div id="book">
+    <div class="cover" onclick="abrirLibro()">15&nbsp;de&nbsp;Malena<br><small>Tocá para abrir 💕</small></div>
+  </div>
+
+  <!-- ⏪⏩ Flechas -->
+  <div id="controls">
+    <button id="prev" class="btn">⬅</button>
+    <button id="next" class="btn">➡</button>
+  </div>
+</div>
+
+<!-- 🎵 Música -->
+<audio id="musica" loop>
+  <source src="musica.mp3" type="audio/mpeg">
+  Tu navegador no soporta audio.
+</audio>
+
+<!-- 💬 Mensajes -->
+<div id="mensaje"></div>
+
+<!-- 📜 Instructivo -->
+<div id="instructivo">
+  <p>📖 Bienvenido al álbum virtual de Male. En cada página, podras subir una foto relacionada con cada consigna. Usá las flechitas para avanzar o volver. Muchas gracias y disfrute de la fiesta.</p>
+  <button onclick="cerrarInstructivo()">¡Entendido!</button>
+</div>
+
+<script>
+  const consignas = [
+    "🎉 Con la cumpleañera", "🕺 Bailando", "🤝 Con alguien nuevo",
+    "🎂 Comiendo torta", "👯‍♀️ Mejor amig@", "👨‍👩‍👧‍👦 En familia",
+    "🎩 Accesorio divertido", "👗 Outfit completo", "😂 Momento gracioso",
+    "💖 Con rosa/fucsia", "🎧 Con el DJ", "📸 Mesa completa",
+    "🎈 Decoración favorita", "🍹 Tu bebida preferida", "🕰️ Algo inesperado",
+    "✨ Foto con luces", "🥳 En la pista de baile", "💬 Mensaje para Male",
+    "🎁 Tu regalo para ella", "🌟 Tu recuerdo favorito"
+  ];
+
+  const book = document.getElementById("book");
+  const mensaje = document.getElementById("mensaje");
+  const musica = document.getElementById("musica");
+
+  let paginaActual = 0;
+  let completados = 0;
+
+  function abrirLibro() {
+    book.classList.add("open");
+    musica.play();
+  }
+
+  // Crear páginas
+  consignas.forEach((consigna, i) => {
+    const page = document.createElement("div");
+    page.className = "page";
+    if (i === 0) page.classList.add("active");
+    page.dataset.index = i;
+    page.innerHTML = `
+      <h2>${consigna}</h2>
+      <img src="placeholder.jpg" alt="Foto ${consigna}">
+      <input type="file" accept="image/*">
+    `;
+    book.appendChild(page);
+  });
+
+  // Navegación
+  const btnPrev = document.getElementById("prev");
+  const btnNext = document.getElementById("next");
+
+  function mostrarMensaje(texto, tiempo = 3000) {
+    mensaje.textContent = texto;
+    mensaje.style.display = "block";
+    setTimeout(() => mensaje.style.display = "none", tiempo);
+  }
+
+  function cambiarPagina(nuevoIndex) {
+    const paginas = document.querySelectorAll(".page");
+    if (nuevoIndex < 0 || nuevoIndex >= paginas.length) return;
+    paginas[paginaActual].classList.remove("active");
+    paginas[nuevoIndex].classList.add("active");
+    paginaActual = nuevoIndex;
+    btnPrev.disabled = paginaActual === 0;
+    btnNext.disabled = paginaActual === paginas.length - 1;
+  }
+
+  btnPrev.onclick = () => cambiarPagina(paginaActual - 1);
+  btnNext.onclick = () => cambiarPagina(paginaActual + 1);
+
+  // Guardar fotos
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".page").forEach((pagina, i) => {
+      const input = pagina.querySelector("input");
+      const img = pagina.querySelector("img");
+      const key = "foto_" + i;
+      const guardada = localStorage.getItem(key);
+      if (guardada) {
+        img.src = guardada;
+        completados++;
+      }
+
+      input.addEventListener("change", (e) => {
+        const archivo = e.target.files[0];
+        if (!archivo) return;
+        const lector = new FileReader();
+        lector.onload = ev => {
+          const dataURL = ev.target.result;
+          img.src = dataURL;
+          localStorage.setItem(key, dataURL);
+          mostrarMensaje("📸 ¡Foto guardada!");
+          completados++;
+          if (completados === consignas.length) {
+            mostrarMensaje("🎉 ¡Completaste el álbum! Male te va a amar 💖", 6000);
+            musica.pause();
+          }
+        };
+        lector.readAsDataURL(archivo);
+      });
+    });
+  });
+
+  function cerrarInstructivo() {
+    document.getElementById("instructivo").style.display = "none";
+    musica.play();
+  }
+
+  // Mostrar instructivo al cargar
+  window.onload = () => {
+    document.getElementById("instructivo").style.display = "block";
+    btnPrev.disabled = true;
+  };
+</script>
+</body>
+</html>
